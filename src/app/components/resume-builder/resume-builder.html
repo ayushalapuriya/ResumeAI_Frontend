@@ -1,0 +1,54 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  ResumeBuilder shell — layout only; all content delegated to child components
+════════════════════════════════════════════════════════════════════════════ -->
+<div class="builder-shell">
+
+  <!-- ── Top navigation bar ────────────────────────────────────────────────── -->
+  <app-builder-topbar
+    [accentColor]="accentColor"
+    [saveStatus]="saveStatus()"
+    [isLoading]="isLoading()"
+    [resume]="resume"
+    (backClicked)="onBack()"
+    (exportPdf)="onExportPdf()"
+    (save)="onSave()"
+    (resumeUpdated)="onResumePatched($event)"
+  />
+
+  <!-- ── Main 3-column layout ──────────────────────────────────────────────── -->
+  <div class="builder-body">
+
+    <!-- COL 1 – Section navigation sidebar -->
+    <app-section-nav
+      [sections]="sections"
+      [activeSection]="activeSection()"
+      [selectedTemplate]="selectedTemplate()"
+      [templateId]="templateId()"
+      [accentColor]="accentColor"
+      (sectionChanged)="onSectionChanged($event)"
+    />
+
+    <!-- COL 2 – Form panel (switches sub-form based on activeSection) -->
+    <app-form-panel
+      [resume]="resume"
+      [activeSection]="activeSection()"
+      [accentColor]="accentColor"
+      (addExperience)="onAddExperience()"
+      (removeExperience)="onRemoveExperience($event)"
+      (addEducation)="onAddEducation()"
+      (removeEducation)="onRemoveEducation($event)"
+      (addProject)="onAddProject()"
+      (removeProject)="onRemoveProject($event)"
+      (addSkill)="onAddSkill($event)"
+      (removeSkill)="onRemoveSkill($event)"
+    />
+
+    <!-- COL 3 – Live preview panel -->
+    <app-preview-panel
+      [previewHtml]="livePreviewHtml"
+      (exportPdf)="onExportPdf()"
+    />
+
+  </div>
+
+</div>

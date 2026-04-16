@@ -1,0 +1,75 @@
+<div class="form-section">
+
+  <div class="sec-header">
+    <div class="sec-header-icon" [style.background]="accentColor + '18'" [style.color]="accentColor">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/>
+      </svg>
+    </div>
+    <div>
+      <h2 class="sec-title">Projects</h2>
+      <p class="sec-sub">Side projects, open source, or notable work</p>
+    </div>
+  </div>
+
+  <div class="entry-card" *ngFor="let proj of items; let i = index">
+    <div class="entry-card-header">
+      <div
+        class="entry-card-index"
+        [style.background]="accentColor + '18'"
+        [style.color]="accentColor"
+      >{{ i + 1 }}</div>
+      <span class="entry-card-label">{{ proj.name || 'New Project' }}</span>
+      <button class="btn-remove" (click)="removeItem.emit(proj.id)" aria-label="Remove project">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="field-grid">
+      <div class="field">
+        <label>Project Name</label>
+        <input type="text" [(ngModel)]="proj.name" placeholder="DesignOS" />
+      </div>
+      <div class="field">
+        <label>Your Role</label>
+        <input type="text" [(ngModel)]="proj.role" placeholder="Lead Developer" />
+      </div>
+      <div class="field">
+        <label>Start Date</label>
+        <input type="text" [(ngModel)]="proj.startDate" placeholder="2023" />
+      </div>
+      <div class="field">
+        <label>End Date</label>
+        <input type="text" [(ngModel)]="proj.endDate" placeholder="2024 / Present" />
+      </div>
+      <div class="field full-width">
+        <label>URL / GitHub</label>
+        <input type="text" [(ngModel)]="proj.url" placeholder="github.com/you/project" />
+      </div>
+    </div>
+
+    <div class="field full-width">
+      <label>Description</label>
+      <textarea
+        [(ngModel)]="proj.description"
+        rows="3"
+        placeholder="What did you build? What technologies? What impact?"
+      ></textarea>
+    </div>
+  </div>
+
+  <button
+    class="btn-add-entry"
+    (click)="addItem.emit()"
+    [style.color]="accentColor"
+    [style.border-color]="accentColor + '44'"
+  >
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Add Project
+  </button>
+
+</div>

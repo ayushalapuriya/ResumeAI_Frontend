@@ -1,0 +1,235 @@
+<!-- ── AI Toolbar Buttons ──────────────────────────────────────────────────── -->
+<div class="ai-toolbar">
+
+  <button class="btn-ai-tool" (click)="openModal('ats')" title="Check ATS Score">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+      <polyline points="22,4 12,14.01 9,11.01"/>
+    </svg>
+    ATS Check
+  </button>
+
+  <!-- <button class="btn-ai-tool" (click)="openModal('tailor')" title="Tailor for Job">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    </svg>
+    Tailor
+  </button> -->
+
+  <button class="btn-ai-tool" (click)="openModal('coverLetter')" title="Generate Cover Letter">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+    Cover Letter
+  </button>
+
+  <!-- <button class="btn-ai-tool" (click)="openModal('translate')" title="Translate Resume">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/>
+      <path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/>
+    </svg>
+    Translate
+  </button> -->
+
+</div>
+
+<!-- ══════════════ ATS CHECK MODAL ══════════════ -->
+<div class="ai-modal-backdrop" *ngIf="activeModal() === 'ats'" (click)="closeModal()">
+  <div class="ai-modal" (click)="$event.stopPropagation()">
+    <div class="ai-modal-head">
+      <h3>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/>
+        </svg>
+        ATS Compatibility Check
+      </h3>
+      <div style="display:flex; align-items:center; gap:10px">
+        <span class="ai-quota-badge" *ngIf="quota()" [class.low]="(quota()?.remaining ?? 99) < 5">
+          {{ quota()?.remaining }} credits left
+        </span>
+        <button class="btn-modal-close" (click)="closeModal()">✕</button>
+      </div>
+    </div>
+    <div class="ai-modal-body">
+      <p style="font-size:0.82rem; color:#64748b">
+        Analyse your resume against ATS (Applicant Tracking System) criteria and get an instant score with actionable improvement tips.
+      </p>
+      <div *ngIf="!atsResult() && !aiLoading()">
+        <button class="btn-ai" style="width:100%; justify-content:center; padding:11px"
+                (click)="onCheckAts()">
+          ✦ Run ATS Analysis
+        </button>
+      </div>
+      <div *ngIf="aiLoading()" style="text-align:center; padding:20px; color:#6366f1; font-weight:700">
+        <span class="ai-spin" style="font-size:1.5rem">⟳</span><br>Analysing your resume…
+      </div>
+      <div class="ats-result" *ngIf="atsResult() && !aiLoading()">
+        <div class="ats-score-row">
+          <div class="ats-score-circle" [style.border-color]="atsScoreColor" [style.color]="atsScoreColor">
+            {{ atsResult()!.score }}
+          </div>
+          <div>
+            <div class="ats-score-label">ATS Score</div>
+            <div class="ats-score-sub">
+              {{ atsResult()!.score >= 80 ? 'Excellent — ready to apply!' : atsResult()!.score >= 60 ? 'Good — a few improvements will help' : 'Needs improvement before applying' }}
+            </div>
+          </div>
+        </div>
+        <div class="ats-suggestions" *ngIf="atsResult()!.suggestions?.length">
+          <div style="font-size:0.78rem; font-weight:800; color:#334155; margin-bottom:4px">Suggestions</div>
+          <div class="ats-suggestion-item" *ngFor="let s of atsResult()!.suggestions">
+            <div class="ats-dot"></div>
+            <span>{{ s }}</span>
+          </div>
+        </div>
+        <button class="btn-ai btn-ai-ghost" style="margin-top:4px"
+                [style.border-color]="accentColor" [style.color]="accentColor"
+                (click)="onCheckAts()">Re-analyse</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TAILOR FOR JOB MODAL ══════════════ -->
+<div class="ai-modal-backdrop" *ngIf="activeModal() === 'tailor'" (click)="closeModal()">
+  <div class="ai-modal" (click)="$event.stopPropagation()">
+    <div class="ai-modal-head">
+      <h3>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        Tailor Resume for Job
+      </h3>
+      <div style="display:flex; align-items:center; gap:10px">
+        <span class="ai-quota-badge" *ngIf="quota()" [class.low]="(quota()?.remaining ?? 99) < 5">
+          {{ quota()?.remaining }} credits left
+        </span>
+        <button class="btn-modal-close" (click)="closeModal()">✕</button>
+      </div>
+    </div>
+    <div class="ai-modal-body">
+      <div class="ai-input-group">
+        <label>Job Description</label>
+        <textarea [(ngModel)]="jobDescription" rows="6"
+          placeholder="Paste the full job description here…"></textarea>
+      </div>
+      <button class="btn-ai" style="width:100%; justify-content:center; padding:11px"
+              (click)="onTailorForJob()" [disabled]="aiLoading() || !jobDescription.trim()">
+        <span *ngIf="aiLoading()" class="ai-spin">⟳</span>
+        <span *ngIf="!aiLoading()">✦</span>
+        {{ aiLoading() ? 'Tailoring…' : 'Tailor My Resume' }}
+      </button>
+      <div *ngIf="tailorResult()">
+        <div style="font-size:0.72rem; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px">
+          AI Tailored Summary
+        </div>
+        <div class="ai-result-box">{{ tailorResult() }}</div>
+      </div>
+    </div>
+    <div class="ai-modal-foot" *ngIf="tailorResult()">
+      <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+      <button class="btn-ai" (click)="applyTailoredContent()">Apply to Resume ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ COVER LETTER MODAL ══════════════ -->
+<div class="ai-modal-backdrop" *ngIf="activeModal() === 'coverLetter'" (click)="closeModal()">
+  <div class="ai-modal" (click)="$event.stopPropagation()">
+    <div class="ai-modal-head">
+      <h3>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        Generate Cover Letter
+      </h3>
+      <div style="display:flex; align-items:center; gap:10px">
+        <span class="ai-quota-badge" *ngIf="quota()" [class.low]="(quota()?.remaining ?? 99) < 5">
+          {{ quota()?.remaining }} credits left
+        </span>
+        <button class="btn-modal-close" (click)="closeModal()">✕</button>
+      </div>
+    </div>
+    <div class="ai-modal-body">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <div class="ai-input-group">
+          <label>Job Title applying for</label>
+          <input type="text" [(ngModel)]="coverJobTitle" [placeholder]="resume.jobTitle || 'e.g. Senior Designer'" />
+        </div>
+        <div class="ai-input-group">
+          <label>Company Name</label>
+          <input type="text" [(ngModel)]="coverCompany" placeholder="e.g. Acme Corp" />
+        </div>
+      </div>
+      <button class="btn-ai" style="width:100%; justify-content:center; padding:11px"
+              (click)="onGenerateCoverLetter()" [disabled]="aiLoading()">
+        <span *ngIf="aiLoading()" class="ai-spin">⟳</span>
+        <span *ngIf="!aiLoading()">✦</span>
+        {{ aiLoading() ? 'Writing cover letter…' : 'Generate Cover Letter' }}
+      </button>
+      <div *ngIf="coverResult()">
+        <div style="font-size:0.72rem; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px">
+          Generated Cover Letter
+        </div>
+        <div class="ai-result-box">{{ coverResult() }}</div>
+      </div>
+    </div>
+    <div class="ai-modal-foot" *ngIf="coverResult()">
+      <button class="btn-secondary" (click)="closeModal()">Close</button>
+      <button class="btn-ai btn-ai-ghost" [style.border-color]="accentColor" [style.color]="accentColor"
+              (click)="copyCoverLetter()">📋 Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TRANSLATE MODAL ══════════════ -->
+<div class="ai-modal-backdrop" *ngIf="activeModal() === 'translate'" (click)="closeModal()">
+  <div class="ai-modal" (click)="$event.stopPropagation()">
+    <div class="ai-modal-head">
+      <h3>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+          <path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/>
+          <path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/>
+        </svg>
+        Translate Resume
+      </h3>
+      <div style="display:flex; align-items:center; gap:10px">
+        <span class="ai-quota-badge" *ngIf="quota()" [class.low]="(quota()?.remaining ?? 99) < 5">
+          {{ quota()?.remaining }} credits left
+        </span>
+        <button class="btn-modal-close" (click)="closeModal()">✕</button>
+      </div>
+    </div>
+    <div class="ai-modal-body">
+      <div class="ai-input-group">
+        <label>Target Language</label>
+        <select [(ngModel)]="targetLanguage">
+          <option *ngFor="let lang of LANGUAGES" [value]="lang">{{ lang }}</option>
+        </select>
+      </div>
+      <button class="btn-ai" style="width:100%; justify-content:center; padding:11px"
+              (click)="onTranslate()" [disabled]="aiLoading()">
+        <span *ngIf="aiLoading()" class="ai-spin">⟳</span>
+        <span *ngIf="!aiLoading()">✦</span>
+        {{ aiLoading() ? 'Translating…' : 'Translate to ' + targetLanguage }}
+      </button>
+      <div *ngIf="translateResult()">
+        <div style="font-size:0.72rem; font-weight:800; color:#475569; text-transform:uppercase; letter-spacing:.4px; margin-bottom:8px">
+          Translation Preview
+        </div>
+        <div class="ai-result-box">
+          <div *ngFor="let entry of translateResultEntries" style="margin-bottom:8px">
+            <span style="font-weight:700; text-transform:capitalize; font-size:0.75rem; color:#6366f1">{{ entry.key }}: </span>
+            <span>{{ entry.value }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ai-modal-foot" *ngIf="translateResult() && !translateResult()!['error']">
+      <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+      <button class="btn-ai" (click)="applyTranslation()">Apply Translation ✓</button>
+    </div>
+  </div>
+</div>

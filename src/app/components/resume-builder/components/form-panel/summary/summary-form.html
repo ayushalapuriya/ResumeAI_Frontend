@@ -1,0 +1,61 @@
+<div class="form-section">
+
+  <div class="sec-header">
+    <div class="sec-header-icon" [style.background]="accentColor + '18'" [style.color]="accentColor">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/>
+      </svg>
+    </div>
+    <div>
+      <h2 class="sec-title">Professional Summary</h2>
+      <p class="sec-sub">2–3 sentences that define your brand</p>
+    </div>
+
+    <!-- AI action buttons -->
+    <div style="margin-left:auto; display:flex; gap:7px; flex-shrink:0">
+      <button class="btn-ai" (click)="onGenerateSummary()" [disabled]="aiLoading()">
+        <span *ngIf="aiLoading() && aiOperation()==='generate'" class="ai-spin">⟳</span>
+        <svg *ngIf="!(aiLoading() && aiOperation()==='generate')" width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V15a1 1 0 0 0-2 0v1.93A7 7 0 0 1 5 10h1a1 1 0 0 0 0-2H5a7 7 0 0 1 6-6.93V3a1 1 0 0 0 2 0v-.93A7 7 0 0 1 19 10h-1a1 1 0 0 0 0 2h1a7 7 0 0 1-6 6.93z"/>
+        </svg>
+        Generate
+      </button>
+      <button class="btn-ai btn-ai-ghost" (click)="onImproveSection()"
+              [disabled]="aiLoading() || !resume.summary.trim()"
+              [style.border-color]="accentColor" [style.color]="accentColor">
+        <span *ngIf="aiLoading() && aiOperation()==='improve'" class="ai-spin">⟳</span>
+        <svg *ngIf="!(aiLoading() && aiOperation()==='improve')" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        Improve
+      </button>
+    </div>
+  </div>
+
+  <div class="field full-width">
+    <label>Summary</label>
+    <textarea [(ngModel)]="resume.summary" rows="6"
+      placeholder="Experienced professional with a track record of…"></textarea>
+    <div class="field-meta">
+      <span class="char-count" [class.warn]="resume.summary.length > WARN_AT_LENGTH">
+        {{ resume.summary.length }} / {{ MAX_SUMMARY_LENGTH }}
+      </span>
+    </div>
+  </div>
+
+  <!-- AI result panel -->
+  <div class="ai-panel" *ngIf="aiResult() !== null">
+    <div class="ai-panel-header">
+      <span class="ai-panel-title">
+        ✦ {{ aiOperation() === 'generate' ? 'Generated Summary' : 'Improved Summary' }}
+      </span>
+      <div class="ai-panel-actions">
+        <button class="btn-ai-action" (click)="dismissAiResult()">Discard</button>
+        <button class="btn-ai-action apply" (click)="applyAiResult()">Apply ✓</button>
+      </div>
+    </div>
+    <div class="ai-panel-body">{{ aiResult() }}</div>
+  </div>
+
+</div>

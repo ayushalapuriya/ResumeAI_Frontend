@@ -1,0 +1,22 @@
+<div class="score-banner">
+  <div class="score-ring-wrap">
+    <svg class="score-ring" viewBox="0 0 80 80">
+      <circle cx="40" cy="40" r="32" fill="none" stroke="#e8e8f0" stroke-width="6"/>
+      <circle cx="40" cy="40" r="32" fill="none" stroke="var(--accent)" stroke-width="6"
+        [attr.stroke-dasharray]="dashArray"
+        stroke-linecap="round" transform="rotate(-90 40 40)"/>
+      <text x="40" y="45" text-anchor="middle" fill="var(--accent)"
+        font-size="17" font-weight="800" font-family="inherit">{{ score }}</text>
+    </svg>
+  </div>
+  <div class="score-text">
+    <span class="score-label">AI Resume Score</span>
+    <p class="score-desc">
+      Your resume is in the <strong>top 12%</strong> of applicants.
+      Add certifications to push past 95.
+    </p>
+  </div>
+  <div class="score-actions">
+    <button class="btn-score-improve" (click)="browseTemplates.emit()">Browse Templates</button>
+  </div>
+</div>

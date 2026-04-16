@@ -1,0 +1,210 @@
+.tpl-card {
+  background: #fff;
+  border: 1.5px solid #eee;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tpl-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+}
+
+/* PREVIEW IMAGE */
+.tpl-preview {
+  height: 240px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* GRADIENT OVER IMAGE */
+.tpl-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.05),
+    rgba(0, 0, 0, 0.35)
+  );
+  z-index: 1;
+}
+
+/* MOCK RESUME */
+.tpl-mock-sheet {
+  width: 110px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.tpl-mock-header {
+  padding: 10px 10px 8px;
+}
+
+.mock-name {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 3px;
+  width: 65%;
+  margin-bottom: 4px;
+}
+
+.mock-title {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 2px;
+  width: 45%;
+}
+
+.tpl-mock-body {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.mock-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mock-sec-label {
+  height: 3px;
+  border-radius: 2px;
+  width: 30%;
+  margin-bottom: 3px;
+}
+
+.mock-line {
+  height: 3px;
+  border-radius: 2px;
+  background: #e8e8ee;
+}
+
+.mock-line.wide {
+  width: 100%;
+}
+
+.mock-line.mid {
+  width: 70%;
+}
+
+/* HOVER OVERLAY */
+.tpl-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 15, 20, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 3;
+}
+
+.tpl-overlay.visible {
+  opacity: 1;
+}
+
+/* BUTTONS */
+.tpl-btn-use {
+  padding: 10px 22px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.tpl-btn-use:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.tpl-btn-preview {
+  padding: 9px 22px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tpl-btn-preview:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* BADGES */
+.tpl-pro-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  z-index: 4;
+}
+
+.tpl-new-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  z-index: 4;
+}
+
+/* INFO */
+.tpl-info-row {
+  padding: 13px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #f3f3f3;
+}
+
+.tpl-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 2px;
+}
+
+.tpl-cat {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+.tpl-uses {
+  font-size: 0.75rem;
+  color: #bbb;
+}

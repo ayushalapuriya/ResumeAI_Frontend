@@ -1,0 +1,97 @@
+<div class="form-section">
+
+  <div class="sec-header">
+    <div class="sec-header-icon" [style.background]="accentColor + '18'" [style.color]="accentColor">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+      </svg>
+    </div>
+    <div>
+      <h2 class="sec-title">Work Experience</h2>
+      <p class="sec-sub">Most recent roles first</p>
+    </div>
+  </div>
+
+  <div class="entry-card" *ngFor="let exp of items; let i = index">
+    <div class="entry-card-header">
+      <div class="entry-card-index" [style.background]="accentColor+'18'" [style.color]="accentColor">{{ i+1 }}</div>
+      <span class="entry-card-label">{{ exp.role || 'New Position' }}</span>
+      <button class="btn-remove" (click)="removeItem.emit(exp.id)" aria-label="Remove experience">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="field-grid">
+      <div class="field">
+        <label>Company</label>
+        <input type="text" [(ngModel)]="exp.company" placeholder="Acme Corp" />
+      </div>
+      <div class="field">
+        <label>Job Title</label>
+        <input type="text" [(ngModel)]="exp.role" placeholder="Senior Designer" />
+      </div>
+      <div class="field">
+        <label>Start Date</label>
+        <input type="text" [(ngModel)]="exp.startDate" placeholder="Jan 2022" />
+      </div>
+      <div class="field">
+        <label>End Date</label>
+        <input type="text" [(ngModel)]="exp.endDate" [disabled]="exp.current" placeholder="Dec 2023" />
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="exp.current" /> Currently working here
+        </label>
+      </div>
+    </div>
+
+    <!-- Description + AI actions -->
+    <div class="field full-width">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px">
+        <label style="margin-bottom:0">Description</label>
+        <div style="display:flex; gap:6px">
+          <button class="btn-ai" style="font-size:0.68rem; padding:3px 9px"
+                  (click)="onGenerateBullets(i)" [disabled]="getAiState(i).loading">
+            <span *ngIf="getAiState(i).loading && getAiState(i).operation==='bullets'" class="ai-spin">⟳</span>
+            <span *ngIf="!(getAiState(i).loading && getAiState(i).operation==='bullets')">✦</span>
+            Bullets
+          </button>
+          <button class="btn-ai btn-ai-ghost" style="font-size:0.68rem; padding:3px 9px"
+                  [style.border-color]="accentColor" [style.color]="accentColor"
+                  (click)="onImproveDescription(i)"
+                  [disabled]="getAiState(i).loading || !exp.description.trim()">
+            <span *ngIf="getAiState(i).loading && getAiState(i).operation==='improve'" class="ai-spin">⟳</span>
+            <span *ngIf="!(getAiState(i).loading && getAiState(i).operation==='improve')">↑</span>
+            Improve
+          </button>
+        </div>
+      </div>
+      <textarea [(ngModel)]="exp.description" rows="3"
+        placeholder="Describe your responsibilities and key achievements…"></textarea>
+    </div>
+
+    <!-- AI result panel per entry -->
+    <div class="ai-panel" *ngIf="getAiState(i).result !== null" style="margin-top:8px">
+      <div class="ai-panel-header">
+        <span class="ai-panel-title">
+          ✦ {{ getAiState(i).operation === 'bullets' ? 'Generated Bullets' : 'Improved Description' }}
+        </span>
+        <div class="ai-panel-actions">
+          <button class="btn-ai-action" (click)="dismissAiResult(i)">Discard</button>
+          <button class="btn-ai-action apply" (click)="applyAiResult(i)">Apply ✓</button>
+        </div>
+      </div>
+      <div class="ai-panel-body">{{ getAiState(i).result }}</div>
+    </div>
+  </div>
+
+  <button class="btn-add-entry" (click)="addItem.emit()"
+          [style.color]="accentColor" [style.border-color]="accentColor+'44'">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Add Experience
+  </button>
+
+</div>

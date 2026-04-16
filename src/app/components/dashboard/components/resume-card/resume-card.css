@@ -1,0 +1,111 @@
+.resume-card {
+  background: #fff;
+  border: 1.5px solid #eee;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s;
+}
+
+.resume-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.1);
+}
+
+.resume-card.active-resume {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
+}
+
+.resume-card-bar { height: 4px; width: 100%; }
+
+.resume-card-preview {
+  height: 180px;
+  background: #f8f9fc;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.rmock-header { padding: 10px 12px; flex-shrink: 0; }
+
+.rmock-name-line {
+  height: 7px; background: rgba(255,255,255,0.7);
+  border-radius: 4px; width: 55%; margin-bottom: 5px;
+}
+
+.rmock-title-line {
+  height: 4px; background: rgba(255,255,255,0.45);
+  border-radius: 3px; width: 35%;
+}
+
+.rmock-body {
+  flex: 1; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.rmock-section { display: flex; flex-direction: column; gap: 4px; }
+
+.rmock-sec-head { height: 4px; border-radius: 3px; width: 30%; margin-bottom: 3px; }
+
+.rmock-line { height: 3px; border-radius: 2px; background: #dde1e8; }
+.rmock-line.wide  { width: 100%; }
+.rmock-line.mid   { width: 75%; }
+.rmock-line.short { width: 50%; }
+
+.resume-card-info { padding: 14px 16px; }
+
+.resume-card-meta {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.resume-card-name { font-size: 0.88rem; font-weight: 700; color: #111; margin-bottom: 2px; }
+.resume-card-date { font-size: 0.75rem; color: #aaa; }
+
+.resume-active-badge {
+  background: rgba(34,197,94,0.1);
+  color: #16a34a;
+  border: 1px solid rgba(34,197,94,0.25);
+  font-size: 10px; font-weight: 800;
+  padding: 2px 8px; border-radius: 20px;
+  white-space: nowrap;
+}
+
+.resume-progress-row { margin-bottom: 12px; }
+
+.resume-progress-label {
+  font-size: 11px; color: #aaa; font-weight: 600;
+  display: block; margin-bottom: 5px;
+}
+
+.resume-progress-track {
+  height: 4px; background: #f0f0f4;
+  border-radius: 4px; overflow: hidden;
+}
+
+.resume-progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+
+.resume-card-actions { display: flex; align-items: center; gap: 7px; }
+
+.btn-edit {
+  flex: 1; padding: 7px 0;
+  color: #fff; border: none; border-radius: 8px;
+  font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.btn-edit:hover { opacity: 0.85; }
+
+.btn-icon-action {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  background: #f4f5f8;
+  border: 1px solid #eee;
+  border-radius: 7px;
+  cursor: pointer; color: #888;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-icon-action:hover { background: #eee; color: #333; }
+.btn-icon-action.danger:hover { background: #fff1f1; color: #ef4444; border-color: #fca5a5; }

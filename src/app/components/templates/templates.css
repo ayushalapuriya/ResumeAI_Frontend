@@ -1,0 +1,384 @@
+/* ── Page ── */
+.templates-page {
+min-height: 100vh;
+background: #f8f9fc;
+padding-top: 68px;
+}
+
+.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 0 1.5rem;
+}
+
+/* ── Hero ── */
+.page-hero {
+background: #fff;
+border-bottom: 1px solid #eee;
+padding: 3.5rem 0 2rem;
+}
+
+.page-hero .container {
+display: flex;
+align-items: flex-end;
+justify-content: space-between;
+gap: 2rem;
+flex-wrap: wrap;
+}
+
+.hero-tag {
+display: inline-block;
+font-size: 11px;
+font-weight: 800;
+letter-spacing: 2px;
+color: var(--accent);
+background: rgba(99,102,241,0.08);
+padding: 4px 10px;
+border-radius: 999px;
+margin-bottom: 0.75rem;
+}
+
+.hero-text h1 {
+font-size: 2.4rem;
+font-weight: 800;
+line-height: 1.2;
+letter-spacing: -0.5px;
+color: #0f0f10;
+margin-bottom: 0.75rem;
+}
+
+.grad {
+background: linear-gradient(135deg, var(--accent), #06b6d4);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+
+.hero-text p {
+color: #777;
+font-size: 0.95rem;
+max-width: 460px;
+line-height: 1.6;
+}
+
+/* ── Search ── */
+.search-bar {
+display: flex;
+align-items: center;
+gap: 10px;
+background: #f4f5f8;
+border: 1.5px solid #e8e8ee;
+border-radius: 10px;
+padding: 10px 14px;
+min-width: 260px;
+transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-bar:focus-within {
+border-color: var(--accent);
+box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+background: #fff;
+}
+
+.search-bar svg {
+color: #aaa;
+flex-shrink: 0;
+}
+
+.search-bar input {
+border: none;
+background: transparent;
+outline: none;
+font-size: 0.9rem;
+color: #333;
+font-family: inherit;
+width: 100%;
+}
+
+.search-bar input::placeholder {
+color: #bbb;
+}
+
+/* ── Filter Bar ── */
+.filter-bar {
+background: #fff;
+border-bottom: 1px solid #eee;
+position: sticky;
+top: 68px;
+z-index: 100;
+}
+
+.filter-bar .container {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 1rem;
+height: 52px;
+overflow-x: auto;
+}
+
+.filter-tabs {
+display: flex;
+gap: 4px;
+flex-shrink: 0;
+}
+
+.filter-tab {
+padding: 6px 14px;
+border: none;
+border-radius: 7px;
+background: transparent;
+font-size: 0.85rem;
+font-weight: 600;
+color: #888;
+cursor: pointer;
+font-family: inherit;
+transition: color 0.15s, background 0.15s;
+white-space: nowrap;
+}
+
+.filter-tab:hover {
+color: #333;
+background: #f4f4f6;
+}
+
+.filter-tab.active {
+background: rgba(99,102,241,0.1);
+color: var(--accent);
+}
+
+.result-count {
+font-size: 0.8rem;
+color: #aaa;
+font-weight: 500;
+white-space: nowrap;
+}
+
+/* ── Grid Section ── */
+.grid-section {
+padding: 2.5rem 1.5rem 5rem;
+}
+
+/* ── Skeleton ── */
+.skeleton-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+gap: 1.5rem;
+}
+
+.skeleton-card {
+border-radius: 14px;
+overflow: hidden;
+background: #fff;
+border: 1px solid #eee;
+}
+
+.skel-preview {
+height: 220px;
+background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+background-size: 200% 100%;
+animation: shimmer 1.4s infinite;
+}
+
+.skel-info {
+padding: 14px;
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.skel-line {
+height: 10px;
+border-radius: 5px;
+background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+background-size: 200% 100%;
+animation: shimmer 1.4s infinite;
+}
+
+.skel-line.wide { width: 60%; }
+.skel-line.short { width: 35%; }
+
+@keyframes shimmer {
+0% { background-position: 200% 0; }
+100% { background-position: -200% 0; }
+}
+
+/* ── Template Grid ── */
+.tpl-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+gap: 1.5rem;
+}
+
+/* ── Template Card ── */
+.tpl-card {
+background: #fff;
+border: 1px solid #eee;
+border-radius: 16px;
+overflow: hidden;
+cursor: pointer;
+transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tpl-card:hover {
+transform: translateY(-6px);
+box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
+
+/* ── Preview (Image) ── */
+.tpl-preview {
+height: 260px;
+position: relative;
+overflow: hidden;
+background: #f4f5f8;
+}
+
+.tpl-image {
+width: 100%;
+height: 100%;
+object-fit: cover;
+display: block;
+transition: transform 0.3s ease;
+}
+
+.tpl-card:hover .tpl-image {
+transform: scale(1.05);
+}
+
+/* ── Premium Badge ── */
+.pro-badge {
+position: absolute;
+top: 10px;
+right: 10px;
+background: linear-gradient(135deg, #f59e0b, #d97706);
+color: #fff;
+font-size: 10px;
+font-weight: 800;
+letter-spacing: 1px;
+padding: 3px 8px;
+border-radius: 5px;
+}
+
+/* ── Overlay ── */
+.tpl-overlay {
+position: absolute;
+inset: 0;
+background: rgba(15,15,20,0.55);
+backdrop-filter: blur(4px);
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 10px;
+opacity: 0;
+transition: opacity 0.25s ease;
+}
+
+.tpl-card:hover .tpl-overlay {
+opacity: 1;
+}
+
+.btn-use {
+padding: 9px 20px;
+background: var(--accent);
+color: #fff;
+border: none;
+border-radius: 8px;
+font-size: 0.85rem;
+font-weight: 700;
+cursor: pointer;
+font-family: inherit;
+transition: transform 0.15s, opacity 0.15s;
+}
+
+.btn-use:hover {
+opacity: 0.9;
+transform: translateY(-1px);
+}
+
+.btn-preview {
+padding: 8px 20px;
+background: rgba(255,255,255,0.12);
+color: #fff;
+border: 1.5px solid rgba(255,255,255,0.3);
+border-radius: 8px;
+font-size: 0.85rem;
+font-weight: 600;
+cursor: pointer;
+font-family: inherit;
+}
+
+.btn-preview:hover {
+background: rgba(255,255,255,0.2);
+}
+
+/* ── Info ── */
+.tpl-info {
+padding: 12px 14px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+border-top: 1px solid #f3f3f3;
+}
+
+.tpl-name {
+font-size: 0.9rem;
+font-weight: 700;
+color: #1a1a1a;
+}
+
+.tpl-cat {
+font-size: 0.75rem;
+color: #aaa;
+}
+
+.tpl-uses {
+font-size: 0.75rem;
+color: #bbb;
+}
+
+/* ── Empty State ── */
+.empty-state {
+text-align: center;
+padding: 5rem 2rem;
+}
+
+.empty-icon {
+font-size: 3rem;
+margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+font-size: 1.2rem;
+font-weight: 700;
+color: #333;
+}
+
+.empty-state p {
+color: #999;
+margin-bottom: 1.5rem;
+}
+
+.btn-reset {
+padding: 9px 20px;
+background: var(--accent);
+color: #fff;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+.page-hero .container {
+flex-direction: column;
+align-items: flex-start;
+}
+
+.search-bar {
+width: 100%;
+}
+
+.hero-text h1 {
+font-size: 1.8rem;
+}
+}

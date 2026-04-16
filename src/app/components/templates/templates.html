@@ -1,0 +1,144 @@
+<div class="templates-page">
+
+  <!-- Header -->
+
+  <div class="page-hero">
+    <div class="container">
+      <div class="hero-text">
+        <span class="hero-tag">TEMPLATES</span>
+        <h1>Find your perfect<br><span class="grad">resume template</span></h1>
+        <p>
+          Every design is ATS-optimized and crafted to impress.
+          Pick a style, fill your details, and download.
+        </p>
+      </div>
+
+
+  <!-- Search -->
+  <div class="search-bar">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input
+      type="text"
+      [(ngModel)]="searchQuery"
+      placeholder="Search templates…"
+    />
+  </div>
+</div>
+
+
+  </div>
+
+  <!-- Filter Tabs -->
+
+  <div class="filter-bar">
+    <div class="container">
+      <div class="filter-tabs">
+        <button
+          *ngFor="let cat of categories"
+          class="filter-tab"
+          [class.active]="activeCategory() === cat"
+          (click)="setCategory(cat)"
+        >
+          {{ cat }}
+        </button>
+      </div>
+      <span class="result-count">
+        {{ filteredTemplates.length }} templates
+      </span>
+    </div>
+  </div>
+
+  <!-- Grid Section -->
+
+  <div class="container grid-section">
+
+
+<!-- Loading Skeleton -->
+<div *ngIf="loading()" class="skeleton-grid">
+  <div class="skeleton-card" *ngFor="let n of [1,2,3,4,5,6]">
+    <div class="skel-preview"></div>
+    <div class="skel-info">
+      <div class="skel-line wide"></div>
+      <div class="skel-line short"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Templates Grid -->
+<div *ngIf="!loading()" class="tpl-grid">
+  <div
+    class="tpl-card"
+    *ngFor="let t of filteredTemplates; trackBy: trackById"
+    (mouseenter)="hoveredId.set(t.templateId)"
+    (mouseleave)="hoveredId.set(null)"
+  >
+
+    <!-- Preview (IMAGE BASED) -->
+    <div class="tpl-preview">
+
+      <!-- Template Image -->
+      <img
+        [src]="t.thumbnailUrl || 'assets/default-template.png'"
+        (error)="t.thumbnailUrl='assets/default-template.png'"
+        alt="Template Preview"
+        class="tpl-image"
+      />
+
+      <!-- Premium Badge -->
+      <div class="pro-badge" *ngIf="t.isPremium">
+        PRO
+      </div>
+
+      <!-- Hover Overlay -->
+      <div
+        class="tpl-overlay"
+        [class.visible]="hoveredId() === t.templateId"
+      >
+        <button class="btn-use" (click)="useTemplate(t)">
+          Use Template →
+        </button>
+        <button class="btn-preview">
+          Preview
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Info -->
+    <div class="tpl-info">
+      <div>
+        <p class="tpl-name">{{ t.name }}</p>
+        <p class="tpl-cat">{{ t.category }}</p>
+      </div>
+
+      <span class="tpl-uses">
+        {{ (t.usageCount / 1000).toFixed(1) }}k uses
+      </span>
+    </div>
+
+  </div>
+</div>
+
+<!-- Empty State -->
+<div
+  *ngIf="!loading() && filteredTemplates.length === 0"
+  class="empty-state"
+>
+  <div class="empty-icon">🔍</div>
+  <h3>No templates found</h3>
+  <p>Try a different search or category</p>
+
+  <button
+    class="btn-reset"
+    (click)="searchQuery = ''; setCategory('All')"
+  >
+    Clear filters
+  </button>
+</div>
+
+  </div>
+</div>

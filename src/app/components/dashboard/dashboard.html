@@ -1,0 +1,55 @@
+<div class="dashboard-shell">
+
+  <!-- ── Sidebar ── -->
+  <app-dashboard-sidebar
+    [activePage]="activePage()"
+    [user]="currentUser"
+    [userRole]="userRole"
+    (pageChange)="setPage($event)"
+    (logoutClick)="onLogout()"
+  ></app-dashboard-sidebar>
+
+  <!-- ── Main Content ── -->
+  <main class="dash-main">
+
+    <!-- My Resumes Page -->
+    <app-resume-list
+      *ngIf="activePage() === 'resume'"
+      [resumes]="resumes"
+      [activeSkills]="activeSkills"
+      [score]="score"
+      (createNew)="createNewResume()"
+      (editResume)="editResume($event)"
+      (downloadResume)="downloadResume($event)"
+      (duplicateResume)="duplicateResume($event)"
+      (deleteResume)="deleteResume($event)"
+      (browseTemplates)="setPage('templates')"
+    ></app-resume-list>
+
+    <!-- Templates Page -->
+    <app-template-gallery
+      *ngIf="activePage() === 'templates'"
+      [templates]="allTemplates"
+      [loading]="templatesLoading()"
+      [showBackToResumes]="openedFromCreate"
+      (useTemplate)="useTemplate($event)"
+      (startBlank)="createBlankResume()"
+      (backToResumes)="setPage('resume')"
+    ></app-template-gallery>
+
+    <!-- Profile Page -->
+    <app-profile-page
+      *ngIf="activePage() === 'profile'"
+      [user]="currentUser"
+      [userRole]="userRole"
+      [resumeCount]="resumes.length"
+      [score]="score"
+      (back)="setPage('resume')"
+      (saveProfile)="showToast('Profile saved!')"
+    ></app-profile-page>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<app-toast></app-toast>

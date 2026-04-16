@@ -1,0 +1,168 @@
+<div class="landing">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="grid-overlay"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge">✦ Free & Open Source</div>
+
+      <h1 class="hero-title">
+        Build Resumes That<br>
+        <span class="gradient-text">Get You Hired</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Create stunning, ATS-optimized resumes in minutes. Live preview, PDF export,
+        and professional templates — all in one place.
+      </p>
+
+      <div class="hero-actions">
+        <a routerLink="/signup" class="btn btn-primary btn-lg">
+          Get Started Free →
+        </a>
+        <a routerLink="/templates" class="btn btn-outline btn-lg">
+          Explore Templates
+        </a>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="hero-preview">
+      <div class="preview-card">
+        <div class="preview-header">
+          <div class="preview-avatar"></div>
+          <div class="preview-lines">
+            <div class="line line-name"></div>
+            <div class="line line-role"></div>
+          </div>
+        </div>
+
+        <div class="preview-section">
+          <div class="section-label"></div>
+          <div class="line"></div>
+          <div class="line short"></div>
+        </div>
+
+        <div class="preview-section">
+          <div class="section-label"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line short"></div>
+        </div>
+
+        <div class="preview-tags">
+          <span class="tag"></span>
+          <span class="tag"></span>
+          <span class="tag short"></span>
+        </div>
+
+        <div class="preview-cursor"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="container">
+      <div class="stat-item" *ngFor="let stat of stats; trackBy: trackByLabel">
+        <div class="stat-value">{{ stat.value }}</div>
+        <div class="stat-label">{{ stat.label }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">HOW IT WORKS</div>
+        <h2 class="section-title">Three steps to your dream resume</h2>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card" *ngFor="let step of steps; let i = index; trackBy: trackByTitle">
+          <div class="step-number">0{{ i + 1 }}</div>
+          <div class="step-icon">{{ step.icon }}</div>
+          <h3 class="step-title">{{ step.title }}</h3>
+          <p class="step-desc">{{ step.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Templates -->
+  <section class="featured-templates">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">TEMPLATES</div>
+        <h2 class="section-title">Professionally designed templates</h2>
+        <p class="section-subtitle">
+          Every template is crafted to pass ATS systems and impress hiring managers.
+        </p>
+      </div>
+
+      <div class="templates-grid">
+        <div 
+          class="template-card" 
+          *ngFor="let template of featuredTemplates; trackBy: trackById"
+          (click)="onUseTemplate(template)"
+        >
+
+          <!-- Thumbnail -->
+          <div class="template-preview">
+            <img 
+              [src]="template.thumbnailUrl" 
+              [alt]="template.name"
+              class="template-image"
+              loading="lazy"
+            />
+
+            <!-- Premium Badge -->
+            <div class="premium-badge" *ngIf="template.isPremium">
+              PRO
+            </div>
+          </div>
+
+          <!-- Info -->
+          <div class="template-info">
+            <div class="template-meta">
+              <span class="template-name">{{ template.name }}</span>
+              <span class="template-category">{{ template.category }}</span>
+            </div>
+
+            <button 
+              class="btn btn-sm btn-accent"
+              (click)="onUseTemplate(template); $event.stopPropagation()"
+            >
+              Use This →
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="templates-cta">
+        <a routerLink="/templates" class="btn btn-outline">
+          View All Templates
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-card">
+        <h2>Ready to land your next role?</h2>
+        <p>Join thousands of job seekers who built their resume with ResumeForge.</p>
+        <a routerLink="/signup" class="btn btn-primary btn-lg">Start for Free</a>
+      </div>
+    </div>
+  </section>
+
+</div>

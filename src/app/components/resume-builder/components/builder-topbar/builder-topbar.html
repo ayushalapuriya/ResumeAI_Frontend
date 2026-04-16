@@ -1,0 +1,70 @@
+<header class="builder-topbar">
+
+  <!-- Back to Dashboard -->
+  <button class="topbar-back" (click)="backClicked.emit()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="15,18 9,12 15,6"/>
+    </svg>
+    Dashboard
+  </button>
+
+  <!-- Logo + document name -->
+  <div class="topbar-center">
+    <div class="topbar-logo">
+      <span class="logo-mark" [style.background]="accentColor">R</span>
+      <span class="logo-text">Resume<strong>AI</strong></span>
+    </div>
+    <span class="topbar-divider"></span>
+    <span class="topbar-doc-name">
+      <span *ngIf="isLoading" class="loading-indicator">Loading…</span>
+      <span *ngIf="!isLoading">{{ resume?.fullName || 'Untitled Resume' }}</span>
+    </span>
+  </div>
+
+  <!-- AI Toolbar + Actions -->
+  <div class="topbar-actions">
+
+    <!-- AI feature buttons (Tailor / ATS / Cover Letter / Translate) -->
+    <div class="ai-toolbar-wrap">
+      <app-ai-toolbar
+        [resume]="resume"
+        [accentColor]="accentColor"
+        (resumeUpdated)="resumeUpdated.emit($event)"
+      />
+    </div>
+
+    <div class="topbar-divider"></div>
+
+    <!-- Export PDF -->
+    <!-- <button class="btn-topbar-secondary" (click)="exportPdf.emit()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7,10 12,15 17,10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      PDF
+    </button> -->
+
+    <!-- Save -->
+    <button
+      class="btn-topbar-primary"
+      [class.btn-saving]="saveStatus === 'saving'"
+      [class.btn-saved]="saveStatus === 'saved'"
+      [class.btn-error]="saveStatus === 'error'"
+      [style.background]="saveStatus === 'idle' || saveStatus === 'saving' ? accentColor : null"
+      [disabled]="saveStatus === 'saving' || isLoading"
+      (click)="save.emit()"
+    >
+      <svg *ngIf="saveStatus === 'saving'" class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 2a10 10 0 1 0 10 10"/>
+      </svg>
+      <svg *ngIf="saveStatus !== 'saving'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+        <polyline points="17,21 17,13 7,13"/><polyline points="7,3 7,8 15,8"/>
+      </svg>
+      {{ saveLabel }}
+    </button>
+
+  </div>
+
+</header>
