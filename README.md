@@ -1,90 +1,16 @@
-# 🚀 ResumeAI Frontend (Angular)
+# React + Vite
 
-An AI-powered resume builder built with Angular that helps users create, customize, and enhance professional resumes effortlessly.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
----
+Currently, two official plugins are available:
 
-## 🌐 Overview
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-ResumeAI Frontend is a modern Angular application designed to provide a seamless resume-building experience using AI assistance.
+## React Compiler
 
-### Users can:
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-- Create and edit resumes
-- Select from multiple professional templates
-- Generate AI-powered summaries and cover letters
-- Preview resumes in real-time
-- Export resumes in a clean format
+## Expanding the ESLint configuration
 
----
-
-## 🛠️ Tech Stack
-
-| Technology | Details |
-|---|---|
-| **Framework** | Angular |
-| **Language** | TypeScript |
-| **Styling** | CSS |
-| **HTTP Client** | Angular HttpClient |
-| **Authentication** | JWT-based |
-
----
-
-## ✨ Features
-
-- 📄 Multiple resume templates
-- 🤖 AI-powered content generation
-- 🔐 Secure authentication (Login / Signup)
-- ⚡ Real-time preview updates
-- 🧩 Modular component-based architecture
-- 📱 Fully responsive design
-
----
-
-## 📁 Project Structure
-
-```
-src/
-├── app/
-│   ├── components/       # Reusable UI components
-│   ├── pages/            # Main pages (Dashboard, Editor)
-│   ├── services/         # API communication
-│   ├── models/           # Interfaces & types
-│   └── interceptors/     # JWT interceptors
-├── assets/               # Static assets
-├── environments/         # Environment configs
-└── styles.css            # Global styles
-```
-
----
-
-## ⚙️ Installation & Setup
-
-### Prerequisites
-
-- Node.js (v16 or higher)
-- Angular CLI (`npm install -g @angular/cli`)
-
-### Steps
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/resumeai-frontend.git
-
-# 2. Navigate to the project directory
-cd resumeai-frontend
-
-# 3. Install dependencies
-npm install
-
-# 4. Start the development server
-ng serve
-```
-
-Then open your browser and navigate to:
-
-```
-http://localhost:4200
-```
-
----
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
