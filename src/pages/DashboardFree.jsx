@@ -12,27 +12,26 @@ import './Dashboard.css';
 
 const CARD_COLORS = ['#6366f1', '#0ea5e9', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
 
-const Dashboard = () => {
+const DashboardFree = () => {
   const [activePage, setActivePage] = useState('resume');
   const [resumesLoading, setResumesLoading] = useState(true);
   const [resumes, setResumes] = useState([]);
   const [allTemplates, setAllTemplates] = useState([]);
   const [templatesLoading, setTemplatesLoading] = useState(true);
   const [openedFromCreate, setOpenedFromCreate] = useState(false);
-  
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const userRole = 'Full Stack Developer';
+  
+  const plan = (user?.subscriptionPlan || user?.subscription_plan || '').toUpperCase();
+  const role = (user?.role || '').toUpperCase();
+  const isPremium = role === 'ROLE_PREMIUM' || plan === 'PREMIUM';
+  const userRoleText = isPremium ? 'Premium Member' : 'Free User';
 
   const activeSkills = [
-    { name: 'React',      bg: 'rgba(99,102,241,.1)',  color: '#6366f1', border: 'rgba(99,102,241,.25)'  },
-    { name: 'Node.js',    bg: 'rgba(14,165,233,.1)',  color: '#0ea5e9', border: 'rgba(14,165,233,.25)'  },
+    { name: 'React', bg: 'rgba(99,102,241,.1)', color: '#6366f1', border: 'rgba(99,102,241,.25)' },
+    { name: 'Node.js', bg: 'rgba(14,165,233,.1)', color: '#0ea5e9', border: 'rgba(14,165,233,.25)' },
     { name: 'TypeScript', bg: 'rgba(167,139,250,.1)', color: '#8b5cf6', border: 'rgba(167,139,250,.25)' },
-    { name: 'MongoDB',    bg: 'rgba(34,197,94,.1)',   color: '#16a34a', border: 'rgba(34,197,94,.25)'   },
-    { name: 'AWS',        bg: 'rgba(245,158,11,.1)',  color: '#d97706', border: 'rgba(245,158,11,.25)'  },
-    { name: 'Docker',     bg: 'rgba(248,113,113,.1)', color: '#dc2626', border: 'rgba(248,113,113,.25)' },
-    { name: 'GraphQL',    bg: 'rgba(56,189,248,.1)',  color: '#0284c7', border: 'rgba(56,189,248,.25)'  },
-    { name: 'Python',     bg: 'rgba(251,146,60,.1)',  color: '#ea580c', border: 'rgba(251,146,60,.25)'  },
   ];
 
   const dtoToEntry = useCallback((dto, index) => {
@@ -40,26 +39,23 @@ const Dashboard = () => {
       console.warn('Resume DTO missing ID:', dto);
     }
     return {
-      resumeId:     dto.resumeId || dto.id,
-      name:         dto.title || 'Untitled Resume',
-      updated:      dto.status || 'DRAFT',
+      resumeId: dto.resumeId || dto.id,
+      name: dto.title || 'Untitled Resume',
+      updated: dto.status || 'DRAFT',
       completeness: dto.atsScore || 0,
-      active:       index === 0,
-      color:        CARD_COLORS[index % CARD_COLORS.length]
+      active: index === 0,
+      color: CARD_COLORS[index % CARD_COLORS.length]
     };
   }, []);
 
   const loadResumes = useCallback(async (userId) => {
     setResumesLoading(true);
-    const toastId = toast.loading('Loading your resumes...');
-
     try {
       const dtos = await resumeService.getByUser(userId);
       setResumes(dtos.map((dto, i) => dtoToEntry(dto, i)));
-      toast.dismiss(toastId);
     } catch (err) {
       console.error('Failed to load resumes:', err);
-      toast.error('Could not load resumes', { id: toastId });
+      toast.error('Could not load resumes');
     } finally {
       setResumesLoading(false);
     }
@@ -94,10 +90,17 @@ const Dashboard = () => {
   const handleLogout = () => {
     logout();
     toast.success('Logged out successfully');
-    setTimeout(() => navigate('/login'), 1400);
+    navigate('/login');
   };
 
   const createNewResume = () => {
+    if (resumes.length >= 3) {
+      toast.error('You have reached the limit of 3 resumes. Upgrade to Premium for unlimited resumes!', {
+        duration: 4000,
+        icon: '🚀'
+      });
+      return;
+    }
     setActivePage('templates');
     setOpenedFromCreate(true);
   };
@@ -108,10 +111,14 @@ const Dashboard = () => {
 
   const downloadResume = (r) => {
     toast(`Preparing "${r.name}" for download...`);
-    navigate(`/resume-builder?resumeId=${r.resumeId}&templateId=${r.templateId || 1}&export=pdf`);
+    navigate(`/resume-builder?resumeId=${r.resumeId}&export=pdf`);
   };
 
   const duplicateResume = async (r) => {
+    if (resumes.length >= 3) {
+      toast.error('Resume limit reached! Upgrade to Premium.');
+      return;
+    }
     const toastId = toast.loading('Duplicating resume...');
     try {
       const dto = await resumeService.duplicate(r.resumeId);
@@ -135,11 +142,21 @@ const Dashboard = () => {
   };
 
   const createBlankResume = () => {
+    if (resumes.length >= 3) {
+      toast.error('Resume limit reached!');
+      return;
+    }
     setOpenedFromCreate(false);
     navigate('/resume-builder');
   };
 
   const useTemplate = (t) => {
+    if (t.isPremium) {
+      toast.error('This is a Premium template. Upgrade to use it!', {
+        icon: '💎'
+      });
+      return;
+    }
     navigate(`/resume-builder?templateId=${t.templateId}`);
   };
 
@@ -147,21 +164,46 @@ const Dashboard = () => {
   const score = activeResume?.completeness || 0;
 
   return (
-    <div className="dashboard-shell">
-      <Sidebar 
-        activePage={activePage} 
-        user={user} 
-        userRole={userRole} 
-        onPageChange={handlePageChange} 
+    <div className="dashboard-shell free-user">
+      <Sidebar
+        activePage={activePage}
+        user={user}
+        userRole={isPremium ? "Premium Plan 💎" : "Free Plan"}
+        onPageChange={handlePageChange}
         onLogout={handleLogout}
       />
 
       <main className="dash-main">
+        <div className="upgrade-banner">
+          <div className="banner-content">
+            <h3>Upgrade to Premium</h3>
+            <p>Get unlimited resumes, advanced AI features, and premium templates.</p>
+          </div>
+          <button className="upgrade-btn" onClick={() => navigate('/pricing')}>Upgrade Now</button>
+        </div>
+
+        <div className="quota-status">
+          <div className="quota-item">
+            <span className="quota-label">Resumes</span>
+            <div className="quota-bar">
+              <div className="quota-fill" style={{ width: isPremium ? `${(resumes.length / 100) * 100}%` : `${(resumes.length / 3) * 100}%` }}></div>
+            </div>
+            <span className="quota-value">{resumes.length}/{isPremium ? '∞' : '3'}</span>
+          </div>
+          <div className="quota-item">
+            <span className="quota-label">AI Calls</span>
+            <div className="quota-bar">
+              <div className="quota-fill" style={{ width: isPremium ? '0%' : '40%' }}></div>
+            </div>
+            <span className="quota-value">{isPremium ? 'Unlimited' : '2/5'}</span>
+          </div>
+        </div>
+
         {activePage === 'resume' && (
-          <ResumeList 
-            resumes={resumes} 
-            activeSkills={activeSkills} 
-            score={score} 
+          <ResumeList
+            resumes={resumes}
+            activeSkills={activeSkills}
+            score={score}
             onCreateNew={createNewResume}
             onEditResume={editResume}
             onDownloadResume={downloadResume}
@@ -172,9 +214,9 @@ const Dashboard = () => {
         )}
 
         {activePage === 'templates' && (
-          <TemplateGallery 
-            templates={allTemplates} 
-            loading={templatesLoading} 
+          <TemplateGallery
+            templates={allTemplates}
+            loading={templatesLoading}
             showBackToResumes={openedFromCreate}
             onUseTemplate={useTemplate}
             onStartBlank={createBlankResume}
@@ -183,10 +225,10 @@ const Dashboard = () => {
         )}
 
         {activePage === 'profile' && (
-          <ProfilePage 
-            user={user} 
-            userRole={userRole} 
-            resumeCount={resumes.length} 
+          <ProfilePage
+            user={user}
+            userRole={isPremium ? "Premium Member 💎" : "Free Plan"}
+            resumeCount={resumes.length}
             score={score}
             onBack={() => handlePageChange('resume')}
             onSaveProfile={() => toast.success('Profile saved!')}
@@ -197,4 +239,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardFree;

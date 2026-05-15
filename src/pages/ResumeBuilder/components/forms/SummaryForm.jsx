@@ -1,6 +1,36 @@
 import React from 'react';
+import aiService from '../../../../services/aiService';
+import toast from 'react-hot-toast';
+import { useAuth } from '../../../../context/AuthContext';
 
 const SummaryForm = ({ resume, accentColor, onUpdate }) => {
+  const { user } = useAuth();
+  const [isGenerating, setIsGenerating] = React.useState(false);
+
+  const handleAiGenerate = async () => {
+    if (user?.role === 'ROLE_FREE') {
+      toast('Using 1 of 5 monthly AI generations...', { icon: '🤖' });
+    }
+
+    setIsGenerating(true);
+    const toastId = toast.loading('AI is crafting your summary...');
+
+    try {
+      const result = await aiService.generateSummary(resume, '');
+      onUpdate({ summary: result.summary || result });
+      toast.success('Summary generated!', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      if (err.response?.status === 403) {
+        toast.error('AI Quota exceeded! Upgrade to Premium.', { id: toastId });
+      } else {
+        toast.error('AI generation failed.', { id: toastId });
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleChange = (value) => {
     onUpdate({ summary: value });
   };
@@ -23,11 +53,15 @@ const SummaryForm = ({ resume, accentColor, onUpdate }) => {
         </div>
 
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '7px', flexShrink: 0 }}>
-          <button className="btn-ai" disabled style={{ opacity: 0.5 }}>
+          <button 
+            className="btn-ai" 
+            onClick={handleAiGenerate}
+            disabled={isGenerating}
+          >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V15a1 1 0 0 0-2 0v1.93A7 7 0 0 1 5 10h1a1 1 0 0 0 0-2H5a7 7 0 0 1 6-6.93V3a1 1 0 0 0 2 0v-.93A7 7 0 0 1 19 10h-1a1 1 0 0 0 0 2h1a7 7 0 0 1-6 6.93z"/>
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V15a1 1 0 0 0-2 0v1.93A7 7 0 0 1 5 10h1a1 1 0 0 0 0 2h1a7 7 0 0 1-6 6.93z"/>
             </svg>
-            Generate
+            {isGenerating ? 'Generating...' : 'AI Generate'}
           </button>
         </div>
       </div>

@@ -1,4 +1,6 @@
 import React from 'react';
+import UniversalTemplate from '../../pages/ResumeBuilder/utils/UniversalTemplate';
+import { DEFAULT_RESUME_DATA } from '../../pages/ResumeBuilder/utils/resumeDefaults';
 import './TemplatePreviewModal.css';
 
 const TemplatePreviewModal = ({ open, template, accent, onClose, onUse }) => {
@@ -54,9 +56,17 @@ const TemplatePreviewModal = ({ open, template, accent, onClose, onUse }) => {
               ) : (
                 <div className="preview-live-wrap">
                   <div className="preview-live-scaler">
-                    <div className="preview-live-placeholder" style={{ color: accent }}>
-                      Live Preview coming soon
-                    </div>
+                    {template.htmlLayout ? (
+                      <UniversalTemplate 
+                        data={DEFAULT_RESUME_DATA} 
+                        template={template} 
+                        accentColor={accent} 
+                      />
+                    ) : (
+                      <div className="preview-live-placeholder" style={{ color: accent }}>
+                        Live Preview coming soon
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

@@ -33,9 +33,9 @@ const ResumeList = ({
       <ScoreBanner score={score} onBrowseTemplates={onBrowseTemplates} />
 
       <div className="resume-cards-grid">
-        {resumes.map((r) => (
+        {resumes.map((r, i) => (
           <ResumeCard
-            key={r.resumeId}
+            key={r.resumeId || `resume-${i}-${r.name}`}
             resume={r}
             onEdit={onEditResume}
             onDownload={onDownloadResume}
@@ -59,9 +59,9 @@ const ResumeList = ({
       <div className="skills-snapshot">
         <h3 className="snapshot-title">Skills on Active Resume</h3>
         <div className="snapshot-chips">
-          {activeSkills.map((sk, i) => (
+          {activeSkills.map((sk) => (
             <span
-              key={i}
+              key={sk.name}
               className="snap-chip"
               style={{ background: sk.bg, color: sk.color, borderColor: sk.border }}
             >

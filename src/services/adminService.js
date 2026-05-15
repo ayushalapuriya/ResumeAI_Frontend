@@ -17,8 +17,18 @@ const adminService = {
     return response.data;
   },
 
+  updateUserRole: async (userId, role) => {
+    const response = await authApi.put(`/admin/users/${userId}/role`, { role });
+    return response.data;
+  },
+
   deleteUser: async (userId) => {
     await authApi.delete(`/admin/users/${userId}`);
+  },
+
+  createUser: async (userData) => {
+    const response = await authApi.post('/admin/users', userData);
+    return response.data;
   },
 
   getTemplates: async () => {
@@ -40,6 +50,10 @@ const adminService = {
     await authApi.delete(`/admin/templates/${templateId}`);
   },
 
+  toggleTemplateStatus: async (templateId) => {
+    await authApi.put(`/admin/templates/${templateId}/toggle-status`);
+  },
+
   getStats: async () => {
     const response = await authApi.get('/admin/stats');
     return response.data;
@@ -55,13 +69,18 @@ const adminService = {
     return response.data;
   },
 
+  getGrowthStats: async () => {
+    const response = await authApi.get('/admin/analytics/user-growth');
+    return response.data;
+  },
+
   getAuditLogs: async () => {
     const response = await authApi.get('/admin/audit-logs');
     return response.data;
   },
 
   sendBroadcast: async (messageData) => {
-    await authApi.post('/admin/notifications/broadcast', messageData);
+    await authApi.post('/notifications/broadcast', messageData);
   }
 };
 

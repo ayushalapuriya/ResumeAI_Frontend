@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { renderToString } from 'react-dom/server';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import templateService from '../../services/templateService';
 import resumeService from '../../services/resumeService';
@@ -18,6 +19,7 @@ import BuilderTopbar from './components/BuilderTopbar';
 import SectionNav from './components/SectionNav';
 import FormPanel from './components/FormPanel';
 import PreviewPanel from './components/PreviewPanel';
+import { getTemplateComponent } from './utils/TemplateRegistry';
 
 import './ResumeBuilder.css';
 
@@ -35,6 +37,8 @@ const ResumeBuilder = () => {
   const navigate = useNavigate();
 
   const [activeSection, setActiveSection] = useState('personal');
+  const [builderSections, setBuilderSections] = useState([...BUILDER_SECTIONS]);
+  const [accentColor, setAccentColor] = useState('#6366f1');
   const [templateId, setTemplateId] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState('idle');
@@ -61,7 +65,7 @@ const ResumeBuilder = () => {
       }
     }
 
-    switch (section.sectionName) {
+    switch (section.sectionType) {
       case 'PERSONAL':
         return {
           ...current,
@@ -146,8 +150,8 @@ const ResumeBuilder = () => {
         };
 
         for (const section of sections) {
-          const key = SECTION_TYPE_TO_KEY[section.sectionName];
-          const sid = section.id;
+          const key = SECTION_TYPE_TO_KEY[section.sectionType];
+          const sid = section.sectionId;
           if (sid && key) {
             sectionIds[key] = sid;
           }
@@ -155,35 +159,72 @@ const ResumeBuilder = () => {
         }
 
         setResume(updatedResume);
-        setMeta({ resumeId: resumeDto.resumeId, sectionIds });
+        setMeta(prev => ({ ...prev, resumeId: resumeId, sectionIds }));
       }
     } catch (err) {
-      console.error('Failed to load resume:', err);
+      console.error('Load error:', err);
     } finally {
       setIsLoading(false);
     }
   }, [mergeSection]);
 
+  const completionPercentage = useMemo(() => {
+    let score = 0;
+    const total = 10; // Essential milestones
+
+    if (resume.fullName) score++;
+    if (resume.email) score++;
+    if (resume.phone) score++;
+    if (resume.summary && resume.summary.length > 50) score++;
+    if (resume.experience.length > 0) score++;
+    if (resume.education.length > 0) score++;
+    if (resume.skills.length > 2) score++;
+    if (resume.projects.length > 0) score++;
+    if (resume.jobTitle) score++;
+    if (meta.resumeId) score++; // Saved at least once
+
+    return Math.round((score / total) * 100);
+  }, [resume, meta.resumeId]);
+
 
   // ── Derived State ────────────────────────────────────────────────────────
 
-  const accentColor = useMemo(() => {
-    return (
-      selectedTemplate?.cssStyles?.match(/--accent:\s*(#[0-9a-fA-F]{3,8})/)?.[1] ??
-      TEMPLATE_ACCENT_PALETTE[templateId] ??
-      '#6366f1'
-    );
-  }, [selectedTemplate, templateId]);
+  const handleToggleVisibility = useCallback((id) => {
+    setBuilderSections(prev => prev.map(s => 
+      s.id === id ? { ...s, hidden: !s.hidden } : s
+    ));
+  }, []);
 
-  const rawResumeHtml = useMemo(() => {
-    return selectedTemplate?.htmlLayout
-      ? buildTemplatePreviewHtml(
-          selectedTemplate.htmlLayout,
-          selectedTemplate.cssStyles ?? '',
-          resume
-        )
-      : buildUniversalPreviewHtml(resume, accentColor);
-  }, [selectedTemplate, resume, accentColor]);
+  const handleMoveSection = useCallback((index, direction) => {
+    setBuilderSections(prev => {
+      const next = [...prev];
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= next.length) return prev;
+      
+      const temp = next[index];
+      next[index] = next[targetIndex];
+      next[targetIndex] = temp;
+      return next;
+    });
+  }, []);
+
+  const visibleResumeData = useMemo(() => {
+    const data = { ...resume };
+    builderSections.forEach(s => {
+      if (s.hidden) {
+        if (s.id === 'summary') data.summary = '';
+        if (s.id === 'experience') data.experience = [];
+        if (s.id === 'education') data.education = [];
+        if (s.id === 'projects') data.projects = [];
+        if (s.id === 'skills') data.skills = [];
+      }
+    });
+    return data;
+  }, [resume, builderSections]);
+
+  const TemplateComponent = useMemo(() => {
+    return getTemplateComponent(templateId, selectedTemplate);
+  }, [templateId, selectedTemplate]);
 
   const handleExportPdf = useCallback(() => {
     const fullName = (resume.fullName || 'resume').replace(/\s+/g, '_');
@@ -193,22 +234,22 @@ const ResumeBuilder = () => {
       return;
     }
 
+    const htmlContent = renderToString(<TemplateComponent data={visibleResumeData} accentColor={accentColor} />);
+
     printWindow.document.write(`<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>${fullName}</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #fff; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+    body { margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     @page { size: A4; margin: 0; }
-    @media print {
-      html, body { width: 210mm; }
-      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    }
   </style>
 </head>
-<body>${rawResumeHtml}</body>
+<body>
+  ${htmlContent}
+</body>
 </html>`);
 
     printWindow.document.close();
@@ -217,7 +258,7 @@ const ResumeBuilder = () => {
       printWindow.print();
       printWindow.close();
     };
-  }, [resume.fullName, rawResumeHtml]);
+  }, [resume.fullName, TemplateComponent, visibleResumeData, accentColor]);
 
   // ── Effects ──────────────────────────────────────────────────────────────
 
@@ -226,6 +267,10 @@ const ResumeBuilder = () => {
     const fetchTemplate = async () => {
       const t = await templateService.getTemplateById(tid);
       setSelectedTemplate(t);
+      if (t?.cssStyles) {
+        const match = t.cssStyles.match(/--accent:\s*(#[0-9a-fA-F]{3,8})/);
+        if (match) setAccentColor(match[1]);
+      }
     };
     fetchTemplate();
 
@@ -234,37 +279,42 @@ const ResumeBuilder = () => {
     }
   }, [tid, rid, loadResumeFromApi]);
 
-  useEffect(() => {
-    if (searchParams.get('export') === 'pdf' && !isLoading && rawResumeHtml && selectedTemplate) {
-      const timer = setTimeout(() => {
-        handleExportPdf();
-        setSearchParams((prev) => {
-          prev.delete('export');
-          return prev;
-        }, { replace: true });
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading, rawResumeHtml, selectedTemplate, searchParams, setSearchParams, handleExportPdf]);
-
-
   // ── Handlers ─────────────────────────────────────────────────────────────
 
   const handleResumeUpdate = (patch) => {
     setResume(prev => ({ ...prev, ...patch }));
   };
 
+  const handleBack = () => navigate('/dashboard');
+
   const handleSave = async () => {
     setSaveStatus('saving');
     try {
-      const user = JSON.parse(localStorage.getItem('user') ?? '{}');
+      const userStr = localStorage.getItem('user');
+      if (!userStr) {
+        console.error('No user found in localStorage during save');
+        toast.error('You must be logged in to save');
+        setSaveStatus('idle');
+        return;
+      }
+      const user = JSON.parse(userStr);
       const userId = user?.userId ?? user?.id;
 
+      if (!userId) {
+        console.error('User object exists but missing ID:', user);
+        toast.error('User session invalid. Please log in again.');
+        setSaveStatus('idle');
+        return;
+      }
+
+      // Crucial: Determine if we are updating or creating
+      const currentResumeId = meta.resumeId || rid;
+
       const resumeDto = {
-        ...(meta.resumeId ? { id: meta.resumeId } : {}),
+        ...(currentResumeId ? { resumeId: currentResumeId } : {}),
         userId,
         title: resume.fullName || 'My Resume',
-        templateId: templateId,
+        templateId: Number(templateId),
         templateName: selectedTemplate?.name || 'Default Template',
         templateCategory: selectedTemplate?.category || 'General',
         summary: resume.summary || '',
@@ -272,15 +322,15 @@ const ResumeBuilder = () => {
         status: 'DRAFT',
       };
 
-      const saved = meta.resumeId
-        ? await resumeService.update(meta.resumeId, resumeDto)
-        : await resumeService.create(resumeDto);
+      console.log(currentResumeId ? `Updating resume ${currentResumeId}...` : 'Creating new resume...');
 
-      if (saved && saved.id) {
-        setMeta(prev => ({ ...prev, resumeId: saved.id }));
+      const saved = currentResumeId
+        ? await resumeService.update(currentResumeId, resumeDto)
+        : await resumeService.create(resumeDto, user?.role);
 
-        // Update URL
-        setSearchParams({ resumeId: saved.id, templateId });
+      if (saved && saved.resumeId) {
+        setMeta(prev => ({ ...prev, resumeId: saved.resumeId }));
+        setSearchParams({ resumeId: saved.resumeId, templateId });
 
         const sectionPayloads = [
           {
@@ -325,25 +375,22 @@ const ResumeBuilder = () => {
         ];
 
         try {
-          const savedSections = await sectionService.upsertAll(saved.id, sectionPayloads);
-          
-          // Update meta with new section IDs
+          const savedSections = await sectionService.upsertAll(saved.resumeId, sectionPayloads);
           const newSectionIds = { ...meta.sectionIds };
           savedSections.forEach(ss => {
-            if (ss && ss.id && ss.sectionName) {
-              const key = SECTION_TYPE_TO_KEY[ss.sectionName];
-              if (key) newSectionIds[key] = ss.id;
+            if (ss && ss.sectionId && ss.sectionType) {
+              const key = SECTION_TYPE_TO_KEY[ss.sectionType];
+              if (key) newSectionIds[key] = ss.sectionId;
             }
           });
           setMeta(prev => ({ ...prev, sectionIds: newSectionIds }));
         } catch (sectionErr) {
-          console.warn('Sections save failed (resume itself saved OK):', sectionErr);
+          console.warn('Sections save failed:', sectionErr);
         }
 
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 2000);
       } else {
-        // saved is null/undefined — still unblock the button
         setSaveStatus('idle');
       }
     } catch (err) {
@@ -352,9 +399,6 @@ const ResumeBuilder = () => {
       setTimeout(() => setSaveStatus('idle'), 3000);
     }
   };
-
-
-
 
   const handleAddExperience = () => {
     const blank = {
@@ -424,24 +468,24 @@ const ResumeBuilder = () => {
   return (
     <div className="builder-shell">
       <BuilderTopbar
-        accentColor={accentColor}
+        resumeTitle={resume.fullName || 'Untitled Resume'}
         saveStatus={saveStatus}
-        isLoading={isLoading}
-        resume={resume}
-        onBack={() => navigate('/dashboard')}
-        onExportPdf={handleExportPdf}
+        onBack={handleBack}
         onSave={handleSave}
-        onPatch={handleResumeUpdate}
+        onExportPdf={handleExportPdf}
+        resumeId={meta.resumeId || rid}
       />
 
       <div className="builder-body">
         <SectionNav
-          sections={BUILDER_SECTIONS}
+          sections={builderSections}
           activeSection={activeSection}
           selectedTemplate={selectedTemplate}
           templateId={templateId}
           accentColor={accentColor}
           onSectionChange={setActiveSection}
+          onToggleVisibility={handleToggleVisibility}
+          onMoveSection={handleMoveSection}
         />
 
         <FormPanel
@@ -460,7 +504,9 @@ const ResumeBuilder = () => {
         />
 
         <PreviewPanel
-          previewHtml={rawResumeHtml}
+          TemplateComponent={TemplateComponent}
+          resumeData={resume}
+          accentColor={accentColor}
           onExportPdf={handleExportPdf}
         />
       </div>
