@@ -22,5 +22,6 @@ export const authApi = createApi(API_CONFIG.AUTH_BASE);
 export const resumeApi = createApi(API_CONFIG.RESUME_BASE);
 export const sectionApi = createApi(API_CONFIG.SECTION_BASE);
 export const templateApi = createApi(API_CONFIG.TEMPLATE_BASE);
+export const aiApi = createApi(API_CONFIG.AI_BASE);
 
 export default resumeApi;

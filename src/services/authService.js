@@ -20,6 +20,15 @@ const authService = {
     localStorage.removeItem('user');
   },
 
+  updateProfile: async (userId, profileData) => {
+    const response = await authApi.put(`/auth/profile/${userId}`, profileData);
+    // Update stored user data
+    const currentUser = authService.getCurrentUser();
+    const updatedUser = { ...currentUser, ...profileData };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    return response.data;
+  },
+
   getCurrentUser: () => {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;

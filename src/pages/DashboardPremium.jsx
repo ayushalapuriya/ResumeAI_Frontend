@@ -12,7 +12,7 @@ import './Dashboard.css';
 
 const CARD_COLORS = ['#6366f1', '#0ea5e9', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
 
-const Dashboard = () => {
+const DashboardPremium = () => {
   const [activePage, setActivePage] = useState('resume');
   const [resumesLoading, setResumesLoading] = useState(true);
   const [resumes, setResumes] = useState([]);
@@ -22,7 +22,7 @@ const Dashboard = () => {
   
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const userRole = 'Full Stack Developer';
+  const userRole = 'Premium Member';
 
   const activeSkills = [
     { name: 'React',      bg: 'rgba(99,102,241,.1)',  color: '#6366f1', border: 'rgba(99,102,241,.25)'  },
@@ -30,9 +30,6 @@ const Dashboard = () => {
     { name: 'TypeScript', bg: 'rgba(167,139,250,.1)', color: '#8b5cf6', border: 'rgba(167,139,250,.25)' },
     { name: 'MongoDB',    bg: 'rgba(34,197,94,.1)',   color: '#16a34a', border: 'rgba(34,197,94,.25)'   },
     { name: 'AWS',        bg: 'rgba(245,158,11,.1)',  color: '#d97706', border: 'rgba(245,158,11,.25)'  },
-    { name: 'Docker',     bg: 'rgba(248,113,113,.1)', color: '#dc2626', border: 'rgba(248,113,113,.25)' },
-    { name: 'GraphQL',    bg: 'rgba(56,189,248,.1)',  color: '#0284c7', border: 'rgba(56,189,248,.25)'  },
-    { name: 'Python',     bg: 'rgba(251,146,60,.1)',  color: '#ea580c', border: 'rgba(251,146,60,.25)'  },
   ];
 
   const dtoToEntry = useCallback((dto, index) => {
@@ -51,15 +48,12 @@ const Dashboard = () => {
 
   const loadResumes = useCallback(async (userId) => {
     setResumesLoading(true);
-    const toastId = toast.loading('Loading your resumes...');
-
     try {
       const dtos = await resumeService.getByUser(userId);
       setResumes(dtos.map((dto, i) => dtoToEntry(dto, i)));
-      toast.dismiss(toastId);
     } catch (err) {
       console.error('Failed to load resumes:', err);
-      toast.error('Could not load resumes', { id: toastId });
+      toast.error('Could not load resumes');
     } finally {
       setResumesLoading(false);
     }
@@ -94,7 +88,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     logout();
     toast.success('Logged out successfully');
-    setTimeout(() => navigate('/login'), 1400);
+    navigate('/login');
   };
 
   const createNewResume = () => {
@@ -108,7 +102,7 @@ const Dashboard = () => {
 
   const downloadResume = (r) => {
     toast(`Preparing "${r.name}" for download...`);
-    navigate(`/resume-builder?resumeId=${r.resumeId}&templateId=${r.templateId || 1}&export=pdf`);
+    navigate(`/resume-builder?resumeId=${r.resumeId}&export=all`);
   };
 
   const duplicateResume = async (r) => {
@@ -147,16 +141,39 @@ const Dashboard = () => {
   const score = activeResume?.completeness || 0;
 
   return (
-    <div className="dashboard-shell">
+    <div className="dashboard-shell premium-user">
       <Sidebar 
         activePage={activePage} 
         user={user} 
-        userRole={userRole} 
+        userRole="Premium Member 💎" 
         onPageChange={handlePageChange} 
         onLogout={handleLogout}
       />
 
       <main className="dash-main">
+        <header className="premium-header">
+            <div className="welcome-section">
+                <h1>Welcome back, {user?.fullName || 'Premium User'}!</h1>
+                <p>Enjoy unlimited access to all AI features and templates.</p>
+            </div>
+            <div className="premium-badge-big">PREMIUM MEMBER</div>
+        </header>
+
+        <div className="premium-stats">
+            <div className="stat-card">
+                <h3>Total Resumes</h3>
+                <span className="stat-value">{resumes.length}</span>
+            </div>
+            <div className="stat-card">
+                <h3>AI Usage</h3>
+                <span className="stat-value">Unlimited</span>
+            </div>
+            <div className="stat-card">
+                <h3>Templates</h3>
+                <span className="stat-value">All Unlocked</span>
+            </div>
+        </div>
+
         {activePage === 'resume' && (
           <ResumeList 
             resumes={resumes} 
@@ -185,7 +202,7 @@ const Dashboard = () => {
         {activePage === 'profile' && (
           <ProfilePage 
             user={user} 
-            userRole={userRole} 
+            userRole="Premium Member" 
             resumeCount={resumes.length} 
             score={score}
             onBack={() => handlePageChange('resume')}
@@ -197,4 +214,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardPremium;

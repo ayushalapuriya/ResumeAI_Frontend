@@ -10,6 +10,13 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedUser = authService.getCurrentUser();
     if (storedUser) {
+      // Normalize role on refresh
+      const plan = (storedUser.subscriptionPlan || storedUser.subscription_plan || '').toUpperCase();
+      const role = (storedUser.role || '').toUpperCase();
+      
+      if (plan === 'PREMIUM' && role !== 'ROLE_ADMIN') {
+        storedUser.role = 'ROLE_PREMIUM';
+      }
       setUser(storedUser);
     }
     setLoading(false);
@@ -17,6 +24,15 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const userData = await authService.login(email, password);
+    
+    // Normalize role based on subscription plan
+    const plan = (userData.subscriptionPlan || userData.subscription_plan || '').toUpperCase();
+    const role = (userData.role || '').toUpperCase();
+    
+    if (userData && plan === 'PREMIUM' && role !== 'ROLE_ADMIN') {
+      userData.role = 'ROLE_PREMIUM';
+    }
+    
     setUser(userData);
     return userData;
   };

@@ -1,12 +1,13 @@
 import { sectionApi } from './api';
 
 const sectionService = {
-  // GET /sections?resumeId={id}
+  // GET /sections/resume/{id}
   getByResume: async (resumeId) => {
     try {
-      const response = await sectionApi.get('/sections', { params: { resumeId } });
+      const response = await sectionApi.get(`/sections/resume/${resumeId}`);
       return response.data;
     } catch (error) {
+      console.error('Failed to fetch sections:', error);
       return [];
     }
   },
@@ -30,33 +31,28 @@ const sectionService = {
   },
 
   /**
-   * Upsert all sections for a resume: create new ones, update existing ones.
-   * Backend has no bulk endpoint — do it one-by-one.
-   *
-   * Each payload: { sectionId?, resumeId, sectionName, content (JSON string), displayOrder }
+   * Upsert all sections for a resume using the bulk endpoint.
+   * Backend endpoint: POST /sections/bulk/{resumeId}
    */
   upsertAll: async (resumeId, sections) => {
-    const results = [];
-    for (const s of sections) {
-      try {
-        const body = {
-          resumeId,
-          sectionName: s.sectionName,
-          content: typeof s.content === 'string' ? s.content : JSON.stringify(s.content),
-          displayOrder: s.displayOrder,
-        };
-        if (s.sectionId) {
-          const r = await sectionApi.put(`/sections/${s.sectionId}`, body);
-          results.push(r.data);
-        } else {
-          const r = await sectionApi.post('/sections', body);
-          results.push(r.data);
-        }
-      } catch (err) {
-        console.warn(`Section "${s.sectionName}" save failed:`, err);
-      }
+    try {
+      // Align frontend payloads with backend ResumeSection entity
+      const payloads = sections.map(s => ({
+        sectionId: s.sectionId || null,
+        resumeId,
+        sectionType: s.sectionName, // Backend uses sectionType (enum)
+        title: s.title || s.sectionName,
+        content: s.content, // Send as object, Jackson handles Map conversion
+        displayOrder: s.displayOrder,
+        isVisible: true
+      }));
+
+      const response = await sectionApi.post(`/sections/bulk/${resumeId}`, payloads);
+      return response.data;
+    } catch (error) {
+      console.error('Bulk sections save failed:', error);
+      throw error;
     }
-    return results;
   },
 };
 

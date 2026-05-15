@@ -110,7 +110,7 @@ const TemplateGallery = ({
         <div className="tpl-grid">
           {filteredTemplates.map((t) => (
             <TemplateCard
-              key={t.templateId}
+              key={t.templateId || t.id}
               template={t}
               isNew={isNew(t)}
               onUse={onUseTemplate}

@@ -3,7 +3,7 @@ import { resumeApi } from './api';
 const resumeService = {
   getByUser: async (userId) => {
     try {
-      const response = await resumeApi.get('/resumes', { params: { userId } });
+      const response = await resumeApi.get(`/resumes/user/${userId}`);
       return response.data;
     } catch (error) {
       return [];
