@@ -69,8 +69,8 @@ const adminService = {
     return response.data;
   },
 
-  getGrowthStats: async () => {
-    const response = await authApi.get('/admin/analytics/user-growth');
+  getGrowthStats: async (groupBy = 'day') => {
+    const response = await authApi.get(`/admin/analytics/user-growth?groupBy=${groupBy}`);
     return response.data;
   },
 

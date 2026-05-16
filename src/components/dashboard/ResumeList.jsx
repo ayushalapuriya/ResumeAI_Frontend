@@ -1,6 +1,5 @@
 import React from 'react';
 import ResumeCard from './ResumeCard';
-import ScoreBanner from './ScoreBanner';
 import './ResumeList.css';
 
 const ResumeList = ({ 
@@ -30,7 +29,6 @@ const ResumeList = ({
         </button>
       </div>
 
-      <ScoreBanner score={score} onBrowseTemplates={onBrowseTemplates} />
 
       <div className="resume-cards-grid">
         {resumes.map((r, i) => (
