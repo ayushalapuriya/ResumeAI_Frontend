@@ -1,16 +1,20 @@
 import React, { useState, useRef } from 'react';
 import authService from '../../services/authService';
+import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import './ProfilePage.css';
 
 const ProfilePage = ({ user, userRole, resumeCount, score, onBack, onSaveProfile }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { setUser: setGlobalUser } = useAuth();
   const [formData, setFormData] = useState({
     fullName: user?.fullName || '',
     email: user?.email || '',
     phone: user?.phone || '',
-    profilePhoto: user?.profilePhoto || null
+    profilePhoto: user?.profilePhoto || null,
+    jobTitle: user?.jobTitle || '',
+    location: user?.location || ''
   });
   
   const fileInputRef = useRef(null);
@@ -35,6 +39,7 @@ const ProfilePage = ({ user, userRole, resumeCount, score, onBack, onSaveProfile
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData({ ...formData, profilePhoto: reader.result });
+        setIsEditing(true); // Automatically enter edit mode when photo changes
       };
       reader.readAsDataURL(file);
     }
@@ -45,6 +50,11 @@ const ProfilePage = ({ user, userRole, resumeCount, score, onBack, onSaveProfile
     const tid = toast.loading('Updating profile...');
     try {
       await authService.updateProfile(user.userId || user.id, formData);
+      
+      // Update global auth state so header/sidebar update immediately
+      const updatedUser = { ...user, ...formData };
+      setGlobalUser(updatedUser);
+      
       toast.success('Profile updated successfully!', { id: tid });
       setIsEditing(false);
       if (onSaveProfile) onSaveProfile();
@@ -95,8 +105,8 @@ const ProfilePage = ({ user, userRole, resumeCount, score, onBack, onSaveProfile
           </div>
           
           <h3 className="profile-name">{formData.fullName || 'Guest User'}</h3>
-          <p className="profile-role">{userRole}</p>
-          <p className="profile-location">📍 Bangalore, India</p>
+          <p className="profile-role">{formData.jobTitle || userRole}</p>
+          <p className="profile-location">📍 {formData.location || 'Location Not Set'}</p>
           
           <button className="btn-change-photo" onClick={() => fileInputRef.current.click()}>
             Change Photo
@@ -175,11 +185,31 @@ const ProfilePage = ({ user, userRole, resumeCount, score, onBack, onSaveProfile
             </div>
             <div className="profile-field">
               <label>Job Title</label>
-              <div className="profile-field-val">{userRole}</div>
+              {isEditing ? (
+                <input 
+                  name="jobTitle"
+                  value={formData.jobTitle} 
+                  onChange={handleChange}
+                  className="profile-input"
+                  placeholder="e.g. Senior Developer"
+                />
+              ) : (
+                <div className="profile-field-val">{formData.jobTitle || '—'}</div>
+              )}
             </div>
             <div className="profile-field">
               <label>Location</label>
-              <div className="profile-field-val">Bangalore, India</div>
+              {isEditing ? (
+                <input 
+                  name="location"
+                  value={formData.location} 
+                  onChange={handleChange}
+                  className="profile-input"
+                  placeholder="e.g. Bangalore, India"
+                />
+              ) : (
+                <div className="profile-field-val">{formData.location || '—'}</div>
+              )}
             </div>
           </div>
           
