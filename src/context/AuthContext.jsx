@@ -29,6 +29,9 @@ export const AuthProvider = ({ children }) => {
     const plan = (userData.subscriptionPlan || userData.subscription_plan || '').toUpperCase();
     const role = (userData.role || '').toUpperCase();
     
+    // Always store role in uppercase for consistency
+    userData.role = role;
+    
     if (userData && plan === 'PREMIUM' && role !== 'ROLE_ADMIN') {
       userData.role = 'ROLE_PREMIUM';
     }
