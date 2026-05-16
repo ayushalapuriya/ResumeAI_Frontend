@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { renderToString } from 'react-dom/server';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import templateService from '../../services/templateService';
 import resumeService from '../../services/resumeService';
 import sectionService from '../../services/sectionService';
@@ -307,8 +308,25 @@ const ResumeBuilder = () => {
         return;
       }
 
-      // Crucial: Determine if we are updating or creating
+      const isPremium = user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_PREMIUM' || (user?.subscriptionPlan || '').toUpperCase() === 'PREMIUM';
       const currentResumeId = meta.resumeId || rid;
+
+      // 🛡️ Limit Check: Only for NEW resumes and FREE users
+      if (!currentResumeId && !isPremium) {
+        try {
+          const existingResumes = await resumeService.getByUser(userId);
+          if (existingResumes.length >= 3) {
+            toast.error('Resume limit reached! Upgrade to Premium to create more than 3 resumes.', {
+              duration: 5000,
+              icon: '🚀'
+            });
+            setSaveStatus('idle');
+            return;
+          }
+        } catch (err) {
+          console.warn('Limit check failed, proceeding anyway:', err);
+        }
+      }
 
       const resumeDto = {
         ...(currentResumeId ? { resumeId: currentResumeId } : {}),

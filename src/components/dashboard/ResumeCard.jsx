@@ -31,17 +31,6 @@ const ResumeCard = ({ resume, onEdit, onDownload, onDuplicate, onDelete }) => {
           </div>
           {resume.active && <span className="resume-active-badge">Active</span>}
         </div>
-
-        <div className="resume-progress-row">
-          <span className="resume-progress-label">{resume.completeness}% complete</span>
-          <div className="resume-progress-track">
-            <div 
-              className="resume-progress-fill"
-              style={{ width: `${resume.completeness}%`, background: resume.color }}
-            ></div>
-          </div>
-        </div>
-
         <div className="resume-card-actions">
           <button 
             className="btn-edit" 
