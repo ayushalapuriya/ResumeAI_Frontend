@@ -12,7 +12,6 @@ const AdminLayout = () => {
   const [users, setUsers] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
-  const [growthData, setGrowthData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -37,8 +36,7 @@ const AdminLayout = () => {
       safeFetch(adminService.getStats, setStats, 'stats'),
       safeFetch(adminService.getUsers, setUsers, 'users'),
       safeFetch(adminService.getTemplates, setTemplates, 'templates'),
-      safeFetch(adminService.getAuditLogs, setAuditLogs, 'logs'),
-      safeFetch(adminService.getGrowthStats, setGrowthData, 'growth')
+      safeFetch(adminService.getAuditLogs, setAuditLogs, 'logs')
     ]);
     setLoading(false);
   };
@@ -84,7 +82,7 @@ const AdminLayout = () => {
 
         <div className="tab-container">
           <Outlet context={{ 
-            stats, users, setUsers, templates, auditLogs, growthData, fetchInitialData, user 
+            stats, users, setUsers, templates, auditLogs, fetchInitialData, user 
           }} />
         </div>
       </main>
