@@ -7,6 +7,8 @@ import ProfilePage from '../components/dashboard/ProfilePage';
 import { useAuth } from '../context/AuthContext';
 import resumeService from '../services/resumeService';
 import templateService from '../services/templateService';
+import authService from '../services/authService';
+import aiService from '../services/aiService';
 import toast from 'react-hot-toast';
 import './Dashboard.css';
 
@@ -19,6 +21,7 @@ const DashboardFree = () => {
   const [allTemplates, setAllTemplates] = useState([]);
   const [templatesLoading, setTemplatesLoading] = useState(true);
   const [openedFromCreate, setOpenedFromCreate] = useState(false);
+  const [aiQuota, setAiQuota] = useState({ remaining: 5, total: 5, used: 0 });
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -53,8 +56,20 @@ const DashboardFree = () => {
     try {
       const dtos = await resumeService.getByUser(userId);
       setResumes(dtos.map((dto, i) => dtoToEntry(dto, i)));
+      
+      // Also load AI quota
+      const quotaResponse = await aiService.getQuota();
+      // Safety check: handle both {remaining: X} and raw X
+      const remaining = typeof quotaResponse === 'object' ? quotaResponse.remaining : quotaResponse;
+      const safeRemaining = typeof remaining === 'number' ? remaining : 0;
+
+      setAiQuota({ 
+        remaining: safeRemaining, 
+        total: 5, 
+        used: Math.max(0, 5 - safeRemaining)
+      });
     } catch (err) {
-      console.error('Failed to load resumes:', err);
+      console.error('Failed to load dashboard data:', err);
       toast.error('Could not load resumes');
     } finally {
       setResumesLoading(false);
@@ -193,9 +208,9 @@ const DashboardFree = () => {
           <div className="quota-item">
             <span className="quota-label">AI Calls</span>
             <div className="quota-bar">
-              <div className="quota-fill" style={{ width: isPremium ? '0%' : '40%' }}></div>
+              <div className="quota-fill" style={{ width: isPremium ? '0%' : `${(aiQuota.used / aiQuota.total) * 100}%` }}></div>
             </div>
-            <span className="quota-value">{isPremium ? 'Unlimited' : '2/5'}</span>
+            <span className="quota-value">{isPremium ? 'Unlimited' : `${aiQuota.used}/${aiQuota.total}`}</span>
           </div>
         </div>
 

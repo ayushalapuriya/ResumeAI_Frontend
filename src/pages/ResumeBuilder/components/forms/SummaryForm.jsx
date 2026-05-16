@@ -8,17 +8,18 @@ const SummaryForm = ({ resume, accentColor, onUpdate }) => {
   const [isGenerating, setIsGenerating] = React.useState(false);
 
   const handleAiGenerate = async () => {
-    if (user?.role === 'ROLE_FREE') {
-      toast('Using 1 of 5 monthly AI generations...', { icon: '🤖' });
-    }
-
     setIsGenerating(true);
     const toastId = toast.loading('AI is crafting your summary...');
 
     try {
       const result = await aiService.generateSummary(resume, '');
+      
+      // Fetch updated quota to show in toast
+      const quota = await aiService.getQuota();
+      const used = 5 - quota.remaining;
+      
       onUpdate({ summary: result.summary || result });
-      toast.success('Summary generated!', { id: toastId });
+      toast.success(`Summary generated! (${used}/5 calls used)`, { id: toastId });
     } catch (err) {
       console.error(err);
       if (err.response?.status === 403) {
