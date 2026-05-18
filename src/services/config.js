@@ -1,7 +1,9 @@
+const BASE_URL = 'http://localhost:8080';
+
 export const API_CONFIG = {
-  AUTH_BASE: 'http://localhost:8080',
-  RESUME_BASE: 'http://localhost:8080',
-  SECTION_BASE: 'http://localhost:8080',
-  AI_BASE: 'http://localhost:8080',
-  TEMPLATE_BASE: 'http://localhost:8080',
+  AUTH_BASE: BASE_URL,
+  RESUME_BASE: BASE_URL,
+  SECTION_BASE: BASE_URL,
+  AI_BASE: BASE_URL,
+  TEMPLATE_BASE: BASE_URL,
 };
