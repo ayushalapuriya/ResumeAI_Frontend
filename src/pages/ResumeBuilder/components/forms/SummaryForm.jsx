@@ -16,10 +16,16 @@ const SummaryForm = ({ resume, accentColor, onUpdate }) => {
       
       // Fetch updated quota to show in toast
       const quota = await aiService.getQuota();
-      const used = 5 - quota.remaining;
+      let usedText = '';
+      if (quota && typeof quota === 'object' && quota.dailyUsed !== undefined) {
+        usedText = `Daily: ${quota.dailyUsed}/${quota.dailyLimit}, Monthly: ${quota.monthlyUsed}/${quota.monthlyLimit}`;
+      } else {
+        const remaining = typeof quota === 'object' ? quota.remaining : quota;
+        usedText = `${5 - (remaining ?? 0)}/5`;
+      }
       
       onUpdate({ summary: result.summary || result });
-      toast.success(`Summary generated! (${used}/5 calls used)`, { id: toastId });
+      toast.success(`Summary generated! (${usedText} calls used)`, { id: toastId });
     } catch (err) {
       console.error(err);
       if (err.response?.status === 403) {

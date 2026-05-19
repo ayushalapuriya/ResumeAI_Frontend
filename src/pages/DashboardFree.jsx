@@ -21,7 +21,12 @@ const DashboardFree = () => {
   const [allTemplates, setAllTemplates] = useState([]);
   const [templatesLoading, setTemplatesLoading] = useState(true);
   const [openedFromCreate, setOpenedFromCreate] = useState(false);
-  const [aiQuota, setAiQuota] = useState({ remaining: 5, total: 5, used: 0 });
+  const [aiQuota, setAiQuota] = useState({
+    dailyUsed: 0,
+    dailyLimit: 5,
+    monthlyUsed: 0,
+    monthlyLimit: 50
+  });
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -59,15 +64,23 @@ const DashboardFree = () => {
       
       // Also load AI quota
       const quotaResponse = await aiService.getQuota();
-      // Safety check: handle both {remaining: X} and raw X
-      const remaining = typeof quotaResponse === 'object' ? quotaResponse.remaining : quotaResponse;
-      const safeRemaining = typeof remaining === 'number' ? remaining : 0;
-
-      setAiQuota({ 
-        remaining: safeRemaining, 
-        total: 5, 
-        used: Math.max(0, 5 - safeRemaining)
-      });
+      if (quotaResponse && typeof quotaResponse === 'object' && quotaResponse.dailyUsed !== undefined) {
+        setAiQuota({
+          dailyUsed: quotaResponse.dailyUsed,
+          dailyLimit: quotaResponse.dailyLimit,
+          monthlyUsed: quotaResponse.monthlyUsed,
+          monthlyLimit: quotaResponse.monthlyLimit
+        });
+      } else {
+        const remaining = typeof quotaResponse === 'object' ? quotaResponse.remaining : quotaResponse;
+        const safeRemaining = typeof remaining === 'number' ? remaining : 0;
+        setAiQuota({
+          dailyUsed: Math.max(0, 5 - safeRemaining),
+          dailyLimit: 5,
+          monthlyUsed: Math.max(0, 5 - safeRemaining),
+          monthlyLimit: 50
+        });
+      }
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
       toast.error('Could not load resumes');
@@ -206,11 +219,18 @@ const DashboardFree = () => {
             <span className="quota-value">{resumes.length}/{isPremium ? '∞' : '3'}</span>
           </div>
           <div className="quota-item">
-            <span className="quota-label">AI Calls</span>
+            <span className="quota-label">Daily AI Calls</span>
             <div className="quota-bar">
-              <div className="quota-fill" style={{ width: isPremium ? '0%' : `${(aiQuota.used / aiQuota.total) * 100}%` }}></div>
+              <div className="quota-fill" style={{ width: isPremium ? '0%' : `${Math.min(100, (aiQuota.dailyUsed / aiQuota.dailyLimit) * 100)}%` }}></div>
             </div>
-            <span className="quota-value">{isPremium ? 'Unlimited' : `${aiQuota.used}/${aiQuota.total}`}</span>
+            <span className="quota-value">{isPremium ? 'Unlimited' : `${aiQuota.dailyUsed}/${aiQuota.dailyLimit}`}</span>
+          </div>
+          <div className="quota-item">
+            <span className="quota-label">Monthly AI Calls</span>
+            <div className="quota-bar">
+              <div className="quota-fill" style={{ width: isPremium ? '0%' : `${Math.min(100, (aiQuota.monthlyUsed / aiQuota.monthlyLimit) * 100)}%` }}></div>
+            </div>
+            <span className="quota-value">{isPremium ? 'Unlimited' : `${aiQuota.monthlyUsed}/${aiQuota.monthlyLimit}`}</span>
           </div>
         </div>
 
